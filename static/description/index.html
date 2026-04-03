@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Vendor Bill Approval Workflow</title>
+</head>
+<body style="font-family: Roboto, Arial, Helvetica, sans-serif; margin: 0; padding: 0; background: #f8f9fb; color: #222;">
+    <div style="max-width: 1100px; margin: 0 auto; background: #ffffff;">
+        <div style="margin-bottom: 30px;">
+            <img src="banner.png" alt="Branch Bill Approval" style="max-width: 100%; border-radius: 12px;">
+        </div>
+
+        <div style="padding: 40px 50px;background-color: #f7f7f7;border-radius: 10px;">
+            <h1 style="margin: 0; font-size: 34px;">Vendor Bill Approval Workflow</h1>
+            <p style="margin-top: 12px; font-size: 18px; line-height: 1.6;">
+                A professional vendor bill approval workflow for Odoo 19 with Branch and CEO approval routes.
+            </p>
+        </div>
+
+        <div style="padding: 40px 50px;">
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Overview</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    This module adds a structured approval workflow for vendor bills in Odoo 19.
+                    Users can select an approval route directly on the vendor bill, and the system will
+                    automatically manage the correct approval flow.
+                </p>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    It is designed to simplify internal financial controls while keeping the process clear and easy to use.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Approval Routes</h2>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Not Required</h3>
+                        <p style="line-height: 1.7;">Bills can be posted directly without any approval.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Branch Only</h3>
+                        <p style="line-height: 1.7;">Bills require approval from the Branch Approver only.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Branch then CEO</h3>
+                        <p style="line-height: 1.7;">Bills must be approved by Branch first, then by CEO.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">CEO Only</h3>
+                        <p style="line-height: 1.7;">Bills are sent directly to the CEO Approver.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Main Features</h2>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Approval route selection directly on vendor bills</li>
+                    <li>Branch and CEO approval support</li>
+                    <li>Multi-step approval workflow</li>
+                    <li>Rejection with reason</li>
+                    <li>Posting blocked before approval</li>
+                    <li>Automatic activities for approvers</li>
+                    <li>Approval history tracking</li>
+                    <li>Clean workflow controlled by one approval route field</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">How It Works</h2>
+                <div style="background: #fafbff; border-left: 5px solid #4a6cf7; padding: 20px 25px; border-radius: 8px;">
+                    <ol style="font-size: 16px; line-height: 2; margin: 0; padding-left: 20px;">
+                        <li>Create a vendor bill</li>
+                        <li>Select the approval route</li>
+                        <li>Submit the bill for approval</li>
+                        <li>Assigned approver reviews the bill</li>
+                        <li>Approver approves or rejects</li>
+                        <li>Once approved, the bill can be posted</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Configuration</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    Configure the following company-level approvers:
+                </p>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Branch Bill Approver</li>
+                    <li>CEO Bill Approver</li>
+                </ul>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    The system uses these users automatically during the selected approval route.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 20px; color: #1d2a57;">Screenshots</h2>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Company Management "Bill Approval" section</h3>
+                    <img src="assets/screenshots/screenshot_1.png" alt="Vendor Bill Approval Section" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Bill Approval management section</h3>
+                    <img src="assets/screenshots/screenshot_2.png" alt="Branch Approval Flow" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Submit for approval button</h3>
+                    <img src="assets/screenshots/screenshot_3.png" alt="CEO Approval Flow" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Chatter and Information Section</h3>
+                    <img src="assets/screenshots/screenshot_4.png" alt="Rejected Bill with Reason" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+		<div style="margin-bottom: 25px;">
+                    <h3>Notification and todo items</h3>
+                    <img src="assets/screenshots/screenshot_5.png" alt="Rejected Bill with Reason" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+
+		<div style="margin-bottom: 25px;">
+                    <h3>Approve and Reject Button</h3>
+                    <img src="assets/screenshots/screenshot_6.png" alt="Rejected Bill with Reason" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Dependencies</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    This module depends on the following Odoo apps:
+                </p>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Accounting (`account`)</li>
+                    <li>Discuss / Activities (`mail`)</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

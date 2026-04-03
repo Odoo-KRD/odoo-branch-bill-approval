@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_branch_bill_approver" model="res.groups">
+        <field name="name">Branch Bill Approver</field>
+    </record>
+
+    <record id="group_ceo_bill_approver" model="res.groups">
+        <field name="name">CEO Bill Approver</field>
+    </record>
+
+    <record id="group_bill_approval_admin" model="res.groups">
+        <field name="name">Bill Approval Admin</field>
+        <field name="implied_ids" eval="[(4, ref('account.group_account_manager'))]"/>
+    </record>
+
+    <record id="rule_account_move_pending_approval_visibility_user" model="ir.rule">
+        <field name="name">Vendor bills pending approval - restricted for basic users</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        <field name="domain_force">
+            [
+                '|',
+                ('move_type', '!=', 'in_invoice'),
+                '|',
+                ('approval_state', 'in', ['approved', 'not_required']),
+                ('create_uid', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_branch_approver" model="ir.rule">
+        <field name="name">Vendor bills visible to assigned branch approver</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_branch_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                '|',
+                ('move_type', '!=', 'in_invoice'),
+                '|',
+                ('branch_approver_id', '=', user.id),
+                ('approval_state', 'in', ['approved', 'not_required'])
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_ceo_approver" model="ir.rule">
+        <field name="name">Vendor bills visible to assigned CEO approver</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_ceo_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                '|',
+                ('move_type', '!=', 'in_invoice'),
+                '|',
+                ('ceo_approver_id', '=', user.id),
+                ('approval_state', 'in', ['approved', 'not_required'])
+            ]
+        </field>
+    </record>
+</odoo>
