@@ -130,4 +130,4 @@ For support, customizations, or implementation services, add your company suppor
 
 ## License
 
-**LGPL-3**
+**MIT**
