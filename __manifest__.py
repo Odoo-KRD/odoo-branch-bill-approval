@@ -22,7 +22,7 @@ Main capabilities:
     "author": "HostKurd",
     "maintainer": "HostKurd",
     "website": "https://odoo.krd/modules/bill-approval/",
-    "license": "MIT",
+    "license": "Other OSI approved licence",
     "depends": ["account", "mail"],
     "data": [
         "security/security.xml",
