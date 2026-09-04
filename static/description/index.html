@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Branch Accounting Approval</title>
+</head>
+<body style="font-family: Roboto, Arial, Helvetica, sans-serif; margin: 0; padding: 0; background: #f8f9fb; color: #222;">
+    <div style="max-width: 1100px; margin: 0 auto; background: #ffffff;">
+        <div style="margin-bottom: 30px;">
+            <img src="banner.png" alt="Branch Accounting Approval" style="max-width: 100%; border-radius: 12px;">
+        </div>
+
+        <div style="padding: 40px 50px;background-color: #f7f7f7;border-radius: 10px;">
+            <h1 style="margin: 0; font-size: 34px;">Branch Accounting Approval</h1>
+            <p style="margin-top: 12px; font-size: 18px; line-height: 1.6;">
+                Professional Auditor, Branch, CEO, and final Auditor approval routing for vendor bills, vendor credit notes, customer invoices, customer credit notes, and journal entries in Odoo 19.
+            </p>
+        </div>
+
+        <div style="padding: 40px 50px;">
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Overview</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    This module adds a structured approval workflow for accounting documents in Odoo 19.
+                    Users can select an approval route directly on vendor bills, vendor credit notes, customer invoices, customer credit notes, and journal entries,
+                    and the system manages the correct Auditor, Branch, and CEO approval flow automatically.
+                </p>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    It is designed to strengthen internal financial controls while keeping the process clear, traceable, and easy to use. Draft documents can use Auditor Only approval, and posted bills, credit notes, invoices, and manual journal entries that use Branch/CEO routes can be routed to a configured Auditor User for final review.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Approval Routes</h2>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px;">
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Auditor Only</h3>
+                        <p style="line-height: 1.7;">Documents are sent directly to the Auditor User before posting.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Not Required</h3>
+                        <p style="line-height: 1.7;">Restricted bypass route for approval admins and accounting managers.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Branch Only</h3>
+                        <p style="line-height: 1.7;">Documents require approval from the Branch Approver only.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Branch then CEO</h3>
+                        <p style="line-height: 1.7;">Documents must be approved by Branch first, then by CEO.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">CEO Only</h3>
+                        <p style="line-height: 1.7;">Documents are sent directly to the CEO Approver.</p>
+                    </div>
+                    <div style="flex: 1 1 220px; background: #f4f7ff; padding: 20px; border-radius: 12px;">
+                        <h3 style="margin-top: 0;">Auditor Final Review</h3>
+                        <p style="line-height: 1.7;">Posted bills, credit notes, invoices, and manual journal entries that use Branch/CEO routes are forwarded to the configured Auditor User for final approval.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Main Features</h2>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Approval route selection on bills, invoices, and journal entries</li>
+                    <li>Auditor-only, Branch-only, CEO-only, and Branch-then-CEO routing</li>
+                    <li>Final Auditor approval for posted bills, credit notes, invoices, and manual journal entries using Branch/CEO routes</li>
+                    <li>Posting blocked until the selected approval route is complete</li>
+                    <li>Automatic activities for approvers, auditors, and ready-to-post notifications for submitters</li>
+                    <li>Creator/submitter visibility for their own pending documents</li>
+                    <li>CEO-pending visibility protection from branch approvers where required</li>
+                    <li>Rejection with mandatory reason and reset support</li>
+                    <li>Auditor rejection reason/recommendation with correction and resubmission flow</li>
+                    <li>Approval badges, ribbons, search filters, group-bys, and chatter audit trail</li>
+                    <li>Workflow-field tamper protection, approver snapshots, and edit lock after approval</li>
+                </ul>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">How It Works</h2>
+                <div style="background: #fafbff; border-left: 5px solid #4a6cf7; padding: 20px 25px; border-radius: 8px;">
+                    <ol style="font-size: 16px; line-height: 2; margin: 0; padding-left: 20px;">
+                        <li>Create a vendor bill, vendor credit note, customer invoice, customer credit note, or journal entry</li>
+                        <li>Select the approval route</li>
+                        <li>Submit the document for approval</li>
+                        <li>Assigned Branch, CEO, or Auditor approver reviews the document</li>
+                        <li>Approver approves or rejects</li>
+                        <li>Once approved, the submitter is notified that the document is ready to post</li>
+                        <li>Posted bills, credit notes, invoices, and manual journal entries using Branch/CEO routes are forwarded to the Auditor User for final approval</li>
+                        <li>If rejected by the Auditor, the document keeps the recommendation for correction and resubmission</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Configuration</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    Configure the following company-level approvers:
+                </p>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Branch Approver</li>
+                    <li>CEO Approver</li>
+                    <li>Auditor User</li>
+                </ul>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    The system snapshots these users on the accounting document when it is submitted, then uses the snapshot according to the selected approval route and the final posted-document audit stage.
+                </p>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <h2 style="font-size: 26px; margin-bottom: 20px; color: #1d2a57;">Screenshots</h2>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Company Accounting Approval configuration</h3>
+                    <img src="assets/screenshots/screenshot_1.png" alt="Accounting Approval Configuration" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Approval section on accounting documents</h3>
+                    <img src="assets/screenshots/screenshot_2.png" alt="Accounting Approval Section" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Submit for approval button</h3>
+                    <img src="assets/screenshots/screenshot_3.png" alt="Submit for Approval" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Chatter and approval information</h3>
+                    <img src="assets/screenshots/screenshot_4.png" alt="Chatter and Approval Information" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Notifications and activities</h3>
+                    <img src="assets/screenshots/screenshot_5.png" alt="Notifications and Activities" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <h3>Approve and reject actions</h3>
+                    <img src="assets/screenshots/screenshot_6.png" alt="Approve and Reject Actions" style="max-width: 100%; border: 1px solid #ddd; border-radius: 10px;padding: 20px;">
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h2 style="font-size: 26px; margin-bottom: 15px; color: #1d2a57;">Dependencies</h2>
+                <p style="font-size: 16px; line-height: 1.8;">
+                    This module depends on the following Odoo apps:
+                </p>
+                <ul style="font-size: 16px; line-height: 2;">
+                    <li>Accounting (`account`)</li>
+                    <li>Discuss / Activities (`mail`)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+<h2>Schema safety fix</h2><p>Version 19.0.5.0.2 adds defensive schema checks for the Auditor approval fields to prevent missing-column startup errors during upgrade.</p><h2>Production hardening</h2><p>Version 19.0.5.0.3 adds the Auditor Only route, workflow-field tamper protection, approved-document edit locking, approver snapshots, indexed approval fields, and restricted Not Required posting.</p><h2>Ready-to-post posting fix</h2><p>Version 19.0.5.0.4 keeps the approval edit lock for normal edits but allows Odoo internal accounting updates while an approved bill, invoice, or journal entry is being posted.</p><h2>Bill and invoice final-auditor routing/payment fix</h2><p>Version 19.0.5.0.5 forwards posted bills and invoices to the Auditor after Branch/CEO routes, excludes automatic payment/reconciliation journal entries from manual approval, and adds explicit Bill Approval access groups.</p><h2>Credit note and Product column update</h2><p>Version 19.0.5.0.22 extends approval routing to vendor and customer credit notes and adds Product to approval-only Journal Items views.</p><h2>Reversal and visibility hardening</h2><p>Version 19.0.5.0.23 blocks Reverse and Create Invoice earlier for approval-controlled documents and tightens Branch Manager/CEO/Auditor visibility so default approver snapshots do not expose every draft or unsubmitted bill.</p><h2>Analytic column update</h2><p>Version 19.0.5.0.24 adds Analytic to the approval-only Journal Items views through a safe read-only display field for approvers without full accounting access.</p></body>
+</html>

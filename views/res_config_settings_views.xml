@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="res_config_settings_view_form_branch_bill_approval" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.branch.accounting.approval</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <app data-string="Accounting Approval" string="Accounting Approval" name="branch_bill_approval">
+                    <block title="Approval Users" name="branch_bill_approval_users">
+                        <setting string="Default Auditor" help="Global Auditor used for all companies. Company-level Auditor remains only as a fallback for old records.">
+                            <field name="approval_auditor_user_id"/>
+                        </setting>
+                    </block>
+                    <block title="Reset Approval" name="branch_bill_approval_reset">
+                        <setting string="Allow reset after approval route completion" help="Allows Reset Approval after final Auditor approval. Odoo accounting locks and legal restrictions may still prevent Reset to Draft.">
+                            <field name="approval_allow_reset_after_completion"/>
+                        </setting>
+                        <setting string="Only the accountant/request owner can reset approval" help="If disabled, the assigned Branch Manager, CEO, and Auditor can reset approval too.">
+                            <field name="approval_reset_only_submitter"/>
+                        </setting>
+                        <setting string="Reset approval when Reset to Draft is used" help="Keeps approval status consistent when an authorized user resets the bill, invoice, or journal entry to draft.">
+                            <field name="approval_reset_on_button_draft"/>
+                        </setting>
+                    </block>
+                    <block title="Workflow" name="branch_bill_approval_workflow">
+                        <setting string="Require final Auditor review after posting" help="For Branch/CEO routes, posted documents are forwarded to the Auditor for final review.">
+                            <field name="approval_require_final_auditor_review"/>
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

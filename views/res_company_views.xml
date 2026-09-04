@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_company_form_branch_bill_approval" model="ir.ui.view">
+        <field name="name">res.company.form.branch.accounting.approval</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/notebook" position="inside">
+                <page string="Accounting Approval">
+                    <group>
+                        <field name="branch_bill_approver_id"/>
+                        <field name="ceo_bill_approver_id"/>
+                    </group>
+                    <div class="alert alert-info" role="alert">
+                        The Auditor is configured globally in Settings &gt; Accounting Approval. The old company-level Auditor field is kept only as a fallback for existing databases.
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

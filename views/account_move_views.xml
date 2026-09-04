@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_branch_bill_approval" model="ir.ui.view">
+        <field name="name">account.move.form.branch.accounting.approval</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_submit_for_approval"
+                        type="object"
+                        string="Submit for Approval"
+                        class="btn-primary"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or approval_route == 'not_required' or state != 'draft' or submitted_for_approval"/>
+
+                <button name="action_branch_approve"
+                        type="object"
+                        string="Branch Approve"
+                        class="btn-secondary"
+                        invisible="not can_branch_approve"/>
+
+                <button name="action_ceo_approve"
+                        type="object"
+                        string="CEO Approve"
+                        class="btn-secondary"
+                        invisible="not can_ceo_approve"/>
+
+                <button name="action_auditor_approve"
+                        type="object"
+                        string="Auditor Approve"
+                        class="btn-secondary"
+                        invisible="not can_auditor_approve"/>
+
+                <button name="action_reject_approval"
+                        type="object"
+                        string="Reject"
+                        class="btn-secondary"
+                        invisible="not can_reject_approval"/>
+
+                <button name="action_reset_approval"
+                        type="object"
+                        string="Reset Approval"
+                        class="btn-secondary"
+                        invisible="not can_reset_approval"/>
+            </xpath>
+
+            <xpath expr="//sheet" position="inside">
+                <widget name="web_ribbon"
+                        title="To Approval"
+                        bg_color="text-bg-warning"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or approval_state not in ['waiting_branch', 'waiting_ceo']"/>
+                <widget name="web_ribbon"
+                        title="Ready to Post"
+                        bg_color="text-bg-success"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or not approval_ready_to_post"/>
+                <widget name="web_ribbon"
+                        title="Waiting Auditor"
+                        bg_color="text-bg-info"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or approval_state != 'waiting_auditor'"/>
+                <widget name="web_ribbon"
+                        title="Auditor Approved"
+                        bg_color="text-bg-success"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or approval_state != 'auditor_approved'"/>
+                <widget name="web_ribbon"
+                        title="Rejected by Auditor"
+                        bg_color="text-bg-danger"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or not auditor_rejected"/>
+                <widget name="web_ribbon"
+                        title="Rejected"
+                        bg_color="text-bg-danger"
+                        invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'] or approval_state != 'rejected'"/>
+
+                <group invisible="1">
+                    <field name="is_branch_approver"/>
+                    <field name="is_ceo_approver"/>
+                    <field name="is_auditor_approver"/>
+                    <field name="can_submit_for_approval"/>
+                    <field name="can_branch_approve"/>
+                    <field name="can_ceo_approve"/>
+                    <field name="can_auditor_approve"/>
+                    <field name="can_auditor_reject"/>
+                    <field name="can_reject_approval"/>
+                    <field name="can_reset_approval"/>
+                    <field name="approval_readonly_mode"/>
+                    <field name="show_approval_readonly_journal_items"/>
+                    <field name="approval_ready_to_post"/>
+                    <field name="approval_badge_state"/>
+                    <field name="auditor_rejected"/>
+                </group>
+
+                <group string="Approval" invisible="move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']">
+                    <group>
+                        <field name="approval_route"
+                               readonly="submitted_for_approval and approval_state not in ['rejected', 'not_required']"/>
+                        <field name="approval_state" readonly="1"/>
+                        <field name="approval_pending_user_id"
+                               readonly="1"
+                               invisible="approval_state not in ['waiting_branch', 'waiting_ceo', 'waiting_auditor']"/>
+                        <field name="submitted_for_approval" readonly="1"/>
+                        <field name="submitted_for_approval_on" readonly="1"/>
+                        <field name="approval_submitted_by"
+                               readonly="1"
+                               invisible="not submitted_for_approval"/>
+                    </group>
+
+                    <group>
+                        <field name="branch_approver_id" readonly="1"/>
+                        <field name="ceo_approver_id" readonly="1"/>
+                        <field name="auditor_approver_id" readonly="1"/>
+                        <field name="branch_approved" readonly="1"/>
+                        <field name="branch_approved_by" readonly="1" invisible="not branch_approved"/>
+                        <field name="branch_approved_on" readonly="1" invisible="not branch_approved"/>
+                        <field name="ceo_approved" readonly="1"/>
+                        <field name="ceo_approved_by" readonly="1" invisible="not ceo_approved"/>
+                        <field name="ceo_approved_on" readonly="1" invisible="not ceo_approved"/>
+                        <field name="auditor_forwarded_on" readonly="1" invisible="not auditor_forwarded_on"/>
+                        <field name="auditor_approved" readonly="1" invisible="False"/>
+                        <field name="auditor_approved_by" readonly="1" invisible="not auditor_approved"/>
+                        <field name="auditor_approved_on" readonly="1" invisible="not auditor_approved"/>
+                        <field name="auditor_rejected_by" readonly="1" invisible="not auditor_rejected"/>
+                        <field name="auditor_rejected_on" readonly="1" invisible="not auditor_rejected"/>
+                        <field name="auditor_reject_reason" readonly="1" invisible="not auditor_rejected"/>
+                        <field name="rejected_by" readonly="1" invisible="approval_state != 'rejected'"/>
+                        <field name="rejected_on" readonly="1" invisible="approval_state != 'rejected'"/>
+                        <field name="approval_reject_reason" readonly="1" invisible="approval_state != 'rejected'"/>
+                    </group>
+                </group>
+            </xpath>
+
+
+            <xpath expr="//field[@name='invoice_line_ids']" position="attributes">
+                <attribute name="readonly">approval_readonly_mode</attribute>
+            </xpath>
+
+
+            <xpath expr="//notebook" position="inside">
+                <page name="approval_journal_items_tab"
+                      string="Journal Items"
+                      groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor"
+                      invisible="not show_approval_readonly_journal_items or move_type not in ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']">
+                    <field name="line_ids" readonly="1" nolabel="1">
+                        <list string="Journal Items" create="0" edit="0" delete="0" open_form_view="0">
+                            <field name="date" readonly="1" optional="hide"/>
+                            <field name="product_id" readonly="1" optional="show"/>
+                            <field name="account_id" readonly="1"/>
+                            <field name="partner_id" readonly="1" optional="show"/>
+                            <field name="name" string="Label" readonly="1"/>
+                            <field name="approval_analytic_display" string="Analytic Distribution" readonly="1" optional="show"/>
+                            <field name="debit" readonly="1" sum="Total Debit"/>
+                            <field name="credit" readonly="1" sum="Total Credit"/>
+                            <field name="amount_currency" readonly="1" optional="show"/>
+                            <field name="currency_id" readonly="1" optional="hide"/>
+                            <field name="display_type" column_invisible="True"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_invoice_tree_branch_accounting_approval" model="ir.ui.view">
+        <field name="name">account.move.invoice.list.branch.accounting.approval</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="approval_badge_state"
+                       string="Approval"
+                       widget="badge"
+                       optional="show"
+                       decoration-info="approval_badge_state == 'to_submit'"
+                       decoration-warning="approval_badge_state in ['to_approval', 'pending_audit']"
+                       decoration-success="approval_badge_state in ['ready_to_post', 'audit_approved']"
+                       decoration-danger="approval_badge_state in ['rejected', 'auditor_rejected']"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_tree_branch_accounting_approval" model="ir.ui.view">
+        <field name="name">account.move.list.branch.accounting.approval</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="approval_badge_state"
+                       string="Approval"
+                       widget="badge"
+                       optional="show"
+                       decoration-info="approval_badge_state == 'to_submit'"
+                       decoration-warning="approval_badge_state in ['to_approval', 'pending_audit']"
+                       decoration-success="approval_badge_state in ['ready_to_post', 'audit_approved']"
+                       decoration-danger="approval_badge_state in ['rejected', 'auditor_rejected']"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_invoice_filter_branch_accounting_approval" model="ir.ui.view">
+        <field name="name">account.move.search.branch.accounting.approval.invoice</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="approval_my_waiting_documents"
+                        string="My Waiting Approval"
+                        help="Accounting documents created/submitted by me and waiting for approval."
+                        domain="['&amp;', '&amp;', ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor']), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_waiting_my_action"
+                        string="Waiting My Approval"
+                        help="Documents assigned to me for Branch, CEO, or Auditor approval."
+                        domain="[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), ('approval_pending_user_id', '=', uid), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor'])]"/>
+                <filter name="approval_waiting_auditor"
+                        string="Waiting Auditor Approval"
+                        help="Posted bills, credit notes, and invoices waiting for final Auditor approval."
+                        domain="[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), ('approval_state', '=', 'waiting_auditor')]"/>
+                <filter name="approval_ready_to_post"
+                        string="Approved, Ready to Post"
+                        help="Approved accounting documents created/submitted by me that still need posting."
+                        domain="['&amp;', '&amp;', ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), ('approval_ready_to_post', '=', True), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_my_rejected_documents"
+                        string="My Rejected Documents"
+                        help="Accounting documents created/submitted by me that were rejected."
+                        domain="['&amp;', '&amp;', ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), '|', ('approval_state', '=', 'rejected'), ('auditor_rejected', '=', True), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_rejected_by_auditor"
+                        string="Rejected by Auditor"
+                        help="Bills, credit notes, and invoices rejected by the Auditor and reset to draft for correction."
+                        domain="[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund']), ('auditor_rejected', '=', True)]"/>
+                <separator/>
+                <filter name="group_by_approval_state"
+                        string="Approval Status"
+                        context="{'group_by': 'approval_state'}"/>
+                <filter name="group_by_approval_route"
+                        string="Approval Route"
+                        context="{'group_by': 'approval_route'}"/>
+                <filter name="group_by_approval_pending_user"
+                        string="Waiting For"
+                        context="{'group_by': 'approval_pending_user_id'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_account_move_filter_branch_accounting_approval" model="ir.ui.view">
+        <field name="name">account.move.search.branch.accounting.approval.journal</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_account_move_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <separator/>
+                <filter name="approval_my_waiting_entries"
+                        string="My Entries Waiting Approval"
+                        help="Journal entries created/submitted by me and waiting for approval."
+                        domain="['&amp;', '&amp;', ('move_type', '=', 'entry'), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor']), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_waiting_my_action"
+                        string="Waiting My Approval"
+                        help="Journal entries assigned to me for branch, CEO, or Auditor approval."
+                        domain="[('move_type', '=', 'entry'), ('approval_pending_user_id', '=', uid), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor'])]"/>
+                <filter name="approval_waiting_auditor"
+                        string="Waiting Auditor Approval"
+                        help="Posted accounting documents waiting for final Auditor approval."
+                        domain="[('move_type', '=', 'entry'), ('approval_state', '=', 'waiting_auditor')]"/>
+                <filter name="approval_ready_to_post"
+                        string="Approved, Ready to Post"
+                        help="Approved journal entries created/submitted by me that still need posting."
+                        domain="['&amp;', '&amp;', ('move_type', '=', 'entry'), ('approval_ready_to_post', '=', True), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_my_rejected_entries"
+                        string="My Rejected Entries"
+                        help="Journal entries created/submitted by me that were rejected."
+                        domain="['&amp;', '&amp;', ('move_type', '=', 'entry'), '|', ('approval_state', '=', 'rejected'), ('auditor_rejected', '=', True), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]"/>
+                <filter name="approval_rejected_by_auditor"
+                        string="Rejected by Auditor"
+                        help="Journal entries rejected by the Auditor and reset to draft for correction."
+                        domain="[('move_type', '=', 'entry'), ('auditor_rejected', '=', True)]"/>
+                <separator/>
+                <filter name="group_by_approval_state"
+                        string="Approval Status"
+                        context="{'group_by': 'approval_state'}"/>
+                <filter name="group_by_approval_route"
+                        string="Approval Route"
+                        context="{'group_by': 'approval_route'}"/>
+                <filter name="group_by_approval_pending_user"
+                        string="Waiting For"
+                        context="{'group_by': 'approval_pending_user_id'}"/>
+                <filter name="group_by_auditor_approver"
+                        string="Auditor"
+                        context="{'group_by': 'auditor_approver_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

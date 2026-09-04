@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_accounting_approval_waiting_my_action" model="ir.actions.act_window">
+        <field name="name">Waiting My Approval</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']), ('approval_pending_user_id', '=', uid), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor'])]</field>
+        <field name="context">{'search_default_approval_waiting_my_action': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No accounting documents are waiting for your approval.</p>
+        </field>
+    </record>
+
+    <record id="action_accounting_approval_reviewed_by_me" model="ir.actions.act_window">
+        <field name="name">Approved / Rejected by Me</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']), '|', '|', '|', '|', ('branch_approved_by', '=', uid), ('ceo_approved_by', '=', uid), ('auditor_approved_by', '=', uid), ('rejected_by', '=', uid), ('auditor_rejected_by', '=', uid)]</field>
+        <field name="context">{'search_default_group_by_approval_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No approved or rejected accounting documents were found for you.</p>
+        </field>
+    </record>
+
+    <record id="view_account_move_tree_accounting_approval_assigned_journal_entries" model="ir.ui.view">
+        <field name="name">account.move.list.accounting.approval.assigned.journal.entries</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <list string="Assigned Journal Entries" create="0" edit="0" delete="0">
+                <field name="name" string="Number"/>
+                <field name="date"/>
+                <field name="journal_id"/>
+                <field name="ref" string="Reference" optional="show"/>
+                <field name="approval_state" string="Approval Status" widget="badge"/>
+                <field name="approval_pending_user_id" string="Waiting For" optional="show"/>
+                <field name="branch_approver_id" optional="hide"/>
+                <field name="ceo_approver_id" optional="hide"/>
+                <field name="auditor_approver_id" optional="hide"/>
+                <field name="state" widget="badge" optional="show"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_move_search_accounting_approval_assigned_journal_entries" model="ir.ui.view">
+        <field name="name">account.move.search.accounting.approval.assigned.journal.entries</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Assigned Journal Entries">
+                <field name="name" string="Number"/>
+                <field name="ref"/>
+                <field name="journal_id"/>
+                <field name="approval_pending_user_id" string="Waiting For"/>
+                <separator/>
+                <filter name="waiting_my_approval" string="Waiting My Approval" domain="[('move_type', '=', 'entry'), ('approval_pending_user_id', '=', uid), ('approval_state', 'in', ['waiting_branch', 'waiting_ceo', 'waiting_auditor'])]"/>
+                <filter name="approved_by_me" string="Approved by Me" domain="['|', '|', ('branch_approved_by', '=', uid), ('ceo_approved_by', '=', uid), ('auditor_approved_by', '=', uid)]"/>
+                <filter name="rejected_by_me" string="Rejected by Me" domain="['|', ('rejected_by', '=', uid), ('auditor_rejected_by', '=', uid)]"/>
+                <separator/>
+                <filter name="group_by_approval_state" string="Approval Status" context="{'group_by': 'approval_state'}"/>
+                <filter name="group_by_journal" string="Journal" context="{'group_by': 'journal_id'}"/>
+                <filter name="group_by_waiting_for" string="Waiting For" context="{'group_by': 'approval_pending_user_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_accounting_approval_assigned_journal_entries" model="ir.actions.act_window">
+        <field name="name">Assigned Journal Entries</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="branch_bill_approval.view_account_move_tree_accounting_approval_assigned_journal_entries"/>
+        <field name="search_view_id" ref="branch_bill_approval.view_account_move_search_accounting_approval_assigned_journal_entries"/>
+        <field name="domain">[('move_type', '=', 'entry'), '|', '|', '|', '|', '|', '|', '|', ('approval_pending_user_id', '=', uid), ('branch_approved_by', '=', uid), ('ceo_approved_by', '=', uid), ('auditor_approved_by', '=', uid), ('rejected_by', '=', uid), ('auditor_rejected_by', '=', uid), ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]</field>
+        <field name="context">{'default_move_type': 'entry', 'search_default_group_by_approval_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No manual journal entries are assigned to you.</p>
+        </field>
+    </record>
+
+    <record id="view_account_move_line_tree_accounting_approval_assigned" model="ir.ui.view">
+        <field name="name">account.move.line.list.accounting.approval.assigned</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <list string="Assigned Journal Items" create="0" edit="0" delete="0" open_form_view="0">
+                <field name="date"/>
+                <field name="move_id" string="Document"/>
+                <field name="journal_id" optional="show"/>
+                <field name="partner_id" optional="show"/>
+                <field name="product_id" optional="show"/>
+                <field name="account_id"/>
+                <field name="name" string="Label"/>
+                <field name="approval_analytic_display" string="Analytic Distribution" optional="show"/>
+                <field name="debit" sum="Total Debit"/>
+                <field name="credit" sum="Total Credit"/>
+                <field name="balance" sum="Total Balance"/>
+                <field name="amount_currency" optional="hide"/>
+                <field name="currency_id" optional="hide"/>
+                <field name="company_id" optional="hide" groups="base.group_multi_company"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_move_line_search_accounting_approval_assigned" model="ir.ui.view">
+        <field name="name">account.move.line.search.accounting.approval.assigned</field>
+        <field name="model">account.move.line</field>
+        <field name="arch" type="xml">
+            <search string="Assigned Journal Items">
+                <field name="move_id" string="Document"/>
+                <field name="account_id"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="journal_id"/>
+                <separator/>
+                <filter name="manual_journal_entries" string="Manual Journal Entries" domain="[('move_id.move_type', '=', 'entry')]"/>
+                <filter name="bills_invoices" string="Bills / Credit Notes / Invoices" domain="[('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund'])]"/>
+                <separator/>
+                <filter name="group_by_document" string="Document" context="{'group_by': 'move_id'}"/>
+                <filter name="group_by_account" string="Account" context="{'group_by': 'account_id'}"/>
+                <filter name="group_by_partner" string="Partner" context="{'group_by': 'partner_id'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_accounting_approval_assigned_journal_items" model="ir.actions.act_window">
+        <field name="name">Assigned Journal Items</field>
+        <field name="res_model">account.move.line</field>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="branch_bill_approval.view_account_move_line_tree_accounting_approval_assigned"/>
+        <field name="search_view_id" ref="branch_bill_approval.view_account_move_line_search_accounting_approval_assigned"/>
+        <field name="domain">[('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']), '|', '|', '|', '|', '|', '|', '|', ('move_id.approval_pending_user_id', '=', uid), ('move_id.branch_approved_by', '=', uid), ('move_id.ceo_approved_by', '=', uid), ('move_id.auditor_approved_by', '=', uid), ('move_id.rejected_by', '=', uid), ('move_id.auditor_rejected_by', '=', uid), ('move_id.create_uid', '=', uid), ('move_id.approval_submitted_by', '=', uid)]</field>
+        <field name="context">{'search_default_group_by_document': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No journal items were found for accounting documents assigned to you.</p>
+        </field>
+    </record>
+
+    <record id="action_accounting_approval_my_requests" model="ir.actions.act_window">
+        <field name="name">My Approval Requests</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']), '|', ('create_uid', '=', uid), ('approval_submitted_by', '=', uid)]</field>
+        <field name="context">{'search_default_group_by_approval_state': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">You have not submitted any accounting approval requests yet.</p>
+        </field>
+    </record>
+
+    <record id="action_accounting_approval_all_visible" model="ir.actions.act_window">
+        <field name="name">Accounting Approval Documents</field>
+        <field name="res_model">account.move</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry'])]</field>
+        <field name="context">{'search_default_group_by_approval_state': 1}</field>
+    </record>
+
+    <menuitem id="menu_accounting_approval_root"
+              name="Bill Approval"
+              web_icon="branch_bill_approval,static/description/icon.png"
+              sequence="90"
+              groups="branch_bill_approval.group_bill_approval_owner,branch_bill_approval.group_invoice_bill_accountant,branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_waiting_my_action"
+              name="Waiting My Approval"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_waiting_my_action"
+              sequence="10"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_reviewed_by_me"
+              name="Approved / Rejected by Me"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_reviewed_by_me"
+              sequence="20"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_assigned_journal_entries"
+              name="Assigned Journal Entries"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_assigned_journal_entries"
+              sequence="24"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_assigned_journal_items"
+              name="Assigned Journal Items"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_assigned_journal_items"
+              sequence="25"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_my_requests"
+              name="My Approval Requests"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_my_requests"
+              sequence="30"
+              groups="branch_bill_approval.group_bill_approval_owner,branch_bill_approval.group_invoice_bill_accountant,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_all_visible"
+              name="All Visible Documents"
+              parent="branch_bill_approval.menu_accounting_approval_root"
+              action="branch_bill_approval.action_accounting_approval_all_visible"
+              sequence="90"
+              groups="branch_bill_approval.group_invoice_bill_accountant,branch_bill_approval.group_bill_approval_admin"/>
+
+    <!-- Optional shortcut inside the Accounting app for installations that keep the standard Invoicing group on approvers. -->
+    <menuitem id="menu_accounting_approval_accounting_shortcut_root"
+              name="Bill Approval"
+              parent="account.menu_finance"
+              sequence="85"
+              groups="branch_bill_approval.group_bill_approval_owner,branch_bill_approval.group_invoice_bill_accountant,branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_accounting_waiting_my_action"
+              name="Waiting My Approval"
+              parent="branch_bill_approval.menu_accounting_approval_accounting_shortcut_root"
+              action="branch_bill_approval.action_accounting_approval_waiting_my_action"
+              sequence="10"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_accounting_reviewed_by_me"
+              name="Approved / Rejected by Me"
+              parent="branch_bill_approval.menu_accounting_approval_accounting_shortcut_root"
+              action="branch_bill_approval.action_accounting_approval_reviewed_by_me"
+              sequence="20"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_accounting_assigned_journal_entries"
+              name="Assigned Journal Entries"
+              parent="branch_bill_approval.menu_accounting_approval_accounting_shortcut_root"
+              action="branch_bill_approval.action_accounting_approval_assigned_journal_entries"
+              sequence="24"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_accounting_assigned_journal_items"
+              name="Assigned Journal Items"
+              parent="branch_bill_approval.menu_accounting_approval_accounting_shortcut_root"
+              action="branch_bill_approval.action_accounting_approval_assigned_journal_items"
+              sequence="25"
+              groups="branch_bill_approval.group_branch_bill_approver,branch_bill_approval.group_ceo_bill_approver,branch_bill_approval.group_bill_approval_auditor,branch_bill_approval.group_bill_approval_admin"/>
+
+    <menuitem id="menu_accounting_approval_accounting_my_requests"
+              name="My Approval Requests"
+              parent="branch_bill_approval.menu_accounting_approval_accounting_shortcut_root"
+              action="branch_bill_approval.action_accounting_approval_my_requests"
+              sequence="30"
+              groups="branch_bill_approval.group_bill_approval_owner,branch_bill_approval.group_invoice_bill_accountant,branch_bill_approval.group_bill_approval_admin"/>
+</odoo>

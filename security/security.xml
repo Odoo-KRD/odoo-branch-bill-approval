@@ -1,0 +1,236 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+    <record id="module_category_branch_bill_approval" model="ir.module.category">
+        <field name="name">Bill Approval</field>
+        <field name="sequence">35</field>
+    </record>
+
+    <!-- Odoo 19 displays user access rights through res.groups.privilege.
+         category_id was removed from res.groups, so custom groups must be
+         attached to a privilege to appear on the user Access Rights tab. -->
+    <record id="res_groups_privilege_branch_bill_approval" model="res.groups.privilege">
+        <field name="name">Bill Approval</field>
+        <field name="category_id" ref="base.module_category_accounting"/>
+        <field name="sequence">35</field>
+    </record>
+
+
+    <record id="group_bill_approval_owner" model="res.groups">
+        <field name="name">Bill Approval Owner</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_bill_approval_auditor" model="res.groups">
+        <field name="name">Bill Approval Auditor</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_invoice_bill_accountant" model="res.groups">
+        <field name="name">Invoice &amp; Bill Accountant</field>
+        <field name="sequence">30</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_invoice'))]"/>
+    </record>
+
+    <record id="group_branch_bill_approver" model="res.groups">
+        <field name="name">Bill Approval Branch Manager</field>
+        <field name="sequence">40</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_ceo_bill_approver" model="res.groups">
+        <field name="name">Bill Approval CEO</field>
+        <field name="sequence">50</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <record id="group_bill_approval_admin" model="res.groups">
+        <field name="name">Accounting Approval Admin</field>
+        <field name="sequence">60</field>
+        <field name="privilege_id" ref="branch_bill_approval.res_groups_privilege_branch_bill_approval"/>
+        <field name="implied_ids" eval="[(4, ref('base.group_user')), (4, ref('account.group_account_manager'))]"/>
+    </record>
+
+    <!-- Global passthrough rule kept under the original XML id for safe upgrades.
+         Role visibility is controlled by the group-specific rules below. -->
+    <record id="rule_account_move_hide_ceo_pending_from_branch_approver" model="ir.rule">
+        <field name="name">Accounting approval visibility passthrough</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="False"/>
+        <field name="perm_create" eval="False"/>
+        <field name="perm_unlink" eval="False"/>
+    </record>
+
+    <record id="rule_account_move_pending_approval_visibility_user" model="ir.rule">
+        <field name="name">Accounting documents pending approval - restricted for basic users</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
+        <field name="domain_force">
+            [
+                '|',
+                ('move_type', 'not in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|',
+                ('approval_state', 'in', ['approved', 'auditor_approved', 'not_required']),
+                '|',
+                ('approval_pending_user_id', '=', user.id),
+                '|',
+                ('create_uid', '=', user.id),
+                ('approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_bill_approval_owner" model="ir.rule">
+        <field name="name">Accounting approval owner sees own requests</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_bill_approval_owner'))]"/>
+        <field name="domain_force">
+            [
+                ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|',
+                ('create_uid', '=', user.id),
+                ('approval_submitted_by', '=', user.id),
+                ('approval_pending_user_id', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_invoice_bill_accountant" model="ir.rule">
+        <field name="name">Invoice and bill accountants can access accounting documents</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_invoice_bill_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_account_move_auditor" model="ir.rule">
+        <field name="name">Accounting documents visible to assigned auditor</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_bill_approval_auditor'))]"/>
+        <field name="domain_force">
+            [
+                ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('approval_pending_user_id', '=', user.id),
+                ('auditor_approved_by', '=', user.id),
+                ('auditor_rejected_by', '=', user.id),
+                ('create_uid', '=', user.id),
+                ('approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_branch_approver" model="ir.rule">
+        <field name="name">Accounting documents visible to assigned branch manager</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_branch_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('approval_pending_user_id', '=', user.id),
+                ('branch_approved_by', '=', user.id),
+                ('rejected_by', '=', user.id),
+                ('create_uid', '=', user.id),
+                ('approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_ceo_approver" model="ir.rule">
+        <field name="name">Accounting documents visible to assigned CEO approver</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_ceo_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                ('move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('approval_pending_user_id', '=', user.id),
+                ('ceo_approved_by', '=', user.id),
+                ('rejected_by', '=', user.id),
+                ('create_uid', '=', user.id),
+                ('approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_line_bill_approval_owner" model="ir.rule">
+        <field name="name">Accounting approval owner sees own journal items</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_bill_approval_owner'))]"/>
+        <field name="domain_force">
+            [
+                ('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|',
+                ('move_id.create_uid', '=', user.id),
+                ('move_id.approval_submitted_by', '=', user.id),
+                ('move_id.approval_pending_user_id', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_line_invoice_bill_accountant" model="ir.rule">
+        <field name="name">Invoice and bill accountants can access journal items</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_invoice_bill_accountant'))]"/>
+        <field name="domain_force">[(1, '=', 1)]</field>
+    </record>
+
+    <record id="rule_account_move_line_auditor" model="ir.rule">
+        <field name="name">Journal items visible to assigned auditor</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_bill_approval_auditor'))]"/>
+        <field name="domain_force">
+            [
+                ('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('move_id.approval_pending_user_id', '=', user.id),
+                ('move_id.auditor_approved_by', '=', user.id),
+                ('move_id.auditor_rejected_by', '=', user.id),
+                ('move_id.create_uid', '=', user.id),
+                ('move_id.approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_line_branch_approver" model="ir.rule">
+        <field name="name">Journal items visible to assigned branch manager</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_branch_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                ('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('move_id.approval_pending_user_id', '=', user.id),
+                ('move_id.branch_approved_by', '=', user.id),
+                ('move_id.rejected_by', '=', user.id),
+                ('move_id.create_uid', '=', user.id),
+                ('move_id.approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+
+    <record id="rule_account_move_line_ceo_approver" model="ir.rule">
+        <field name="name">Journal items visible to assigned CEO approver</field>
+        <field name="model_id" ref="account.model_account_move_line"/>
+        <field name="groups" eval="[(4, ref('branch_bill_approval.group_ceo_bill_approver'))]"/>
+        <field name="domain_force">
+            [
+                ('move_id.move_type', 'in', ['in_invoice', 'in_refund', 'out_invoice', 'out_refund', 'entry']),
+                '|', '|', '|', '|',
+                ('move_id.approval_pending_user_id', '=', user.id),
+                ('move_id.ceo_approved_by', '=', user.id),
+                ('move_id.rejected_by', '=', user.id),
+                ('move_id.create_uid', '=', user.id),
+                ('move_id.approval_submitted_by', '=', user.id)
+            ]
+        </field>
+    </record>
+</odoo>
