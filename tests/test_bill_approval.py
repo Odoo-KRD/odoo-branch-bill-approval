@@ -31,7 +31,7 @@ class TestBillApproval(TransactionCase):
             "email": "branch@example.com",
             "company_id": self.company.id,
             "company_ids": [(6, 0, [self.company.id])],
-            "groups_id": [(6, 0, branch_groups)],
+            "group_ids": [(6, 0, branch_groups)],
         })
 
         self.ceo_user = self.env["res.users"].create({
@@ -40,7 +40,7 @@ class TestBillApproval(TransactionCase):
             "email": "ceo@example.com",
             "company_id": self.company.id,
             "company_ids": [(6, 0, [self.company.id])],
-            "groups_id": [(6, 0, ceo_groups)],
+            "group_ids": [(6, 0, ceo_groups)],
         })
 
         self.auditor_user = self.env["res.users"].create({
@@ -49,7 +49,7 @@ class TestBillApproval(TransactionCase):
             "email": "auditor@example.com",
             "company_id": self.company.id,
             "company_ids": [(6, 0, [self.company.id])],
-            "groups_id": [(6, 0, auditor_groups)],
+            "group_ids": [(6, 0, auditor_groups)],
         })
 
         self.company.branch_bill_approver_id = self.branch_user
@@ -539,7 +539,7 @@ class TestBillApproval(TransactionCase):
             "email": "replacement.branch@example.com",
             "company_id": self.company.id,
             "company_ids": [(6, 0, [self.company.id])],
-            "groups_id": [(6, 0, [
+            "group_ids": [(6, 0, [
                 self.env.ref("account.group_account_invoice").id,
                 self.env.ref("account.group_account_user").id,
                 self.env.ref("branch_bill_approval.group_branch_bill_approver").id,
@@ -590,7 +590,7 @@ class TestBillApproval(TransactionCase):
             "email": "branch.manager.only@example.com",
             "company_id": self.company.id,
             "company_ids": [(6, 0, [self.company.id])],
-            "groups_id": [(6, 0, [
+            "group_ids": [(6, 0, [
                 self.env.ref("branch_bill_approval.group_branch_bill_approver").id,
             ])],
         })
@@ -604,3 +604,58 @@ class TestBillApproval(TransactionCase):
 
         self.assertEqual(set(visible_lines.ids), set(bill.line_ids.ids))
 
+
+    def _create_branch_credit_note_from_reversal(self):
+        """Post a bill the Branch Manager is not assigned to, then reverse it."""
+        original_bill = self._create_bill("not_required")
+        original_bill.action_post()
+        credit_note = original_bill._reverse_moves([{
+            "ref": "Reversal of: %s" % original_bill.name,
+            "invoice_date": fields.Date.today(),
+        }])
+        self.assertEqual(credit_note.move_type, "in_refund")
+        self.assertEqual(credit_note.reversed_entry_id, original_bill)
+        credit_note.approval_route = "branch"
+        credit_note.action_submit_for_approval()
+        self.assertEqual(credit_note.approval_pending_user_id, self.branch_user)
+        return original_bill, credit_note
+
+    def test_branch_manager_can_open_credit_note_created_by_reverse(self):
+        original_bill, credit_note = self._create_branch_credit_note_from_reversal()
+        branch_credit_note = credit_note.with_user(self.branch_user)
+
+        # Same shape of request as the credit note form: the original bill is
+        # loaded as a many2one with its display name only.
+        result = branch_credit_note.web_read({
+            "name": {},
+            "approval_state": {},
+            "reversed_entry_id": {"fields": {"display_name": {}}},
+            "line_ids": {"fields": {"name": {}, "balance": {}}},
+        })
+
+        self.assertEqual(result[0]["id"], credit_note.id)
+        self.assertEqual(result[0]["reversed_entry_id"]["id"], original_bill.id)
+        self.assertEqual(
+            result[0]["reversed_entry_id"]["display_name"],
+            original_bill.display_name,
+        )
+        self.assertEqual(
+            {line["id"] for line in result[0]["line_ids"]},
+            set(credit_note.line_ids.ids),
+        )
+
+    def test_branch_manager_still_cannot_open_unassigned_original_bill(self):
+        original_bill, _credit_note = self._create_branch_credit_note_from_reversal()
+        branch_bill = original_bill.with_user(self.branch_user)
+
+        with self.assertRaises(AccessError):
+            branch_bill.web_read({"name": {}})
+        with self.assertRaises(AccessError):
+            branch_bill.read(["name"])
+        with self.assertRaises(AccessError):
+            original_bill.line_ids.with_user(self.branch_user).read(["name"])
+        self.assertFalse(
+            self.env["account.move"].with_user(self.branch_user).search([
+                ("id", "=", original_bill.id),
+            ])
+        )

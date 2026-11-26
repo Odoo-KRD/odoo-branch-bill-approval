@@ -278,3 +278,14 @@ Version 19.0.5.0.24 adds an **Analytic** column to the approval-only read-only J
 ## 19.0.5.0.25
 
 Version 19.0.5.0.25 renames the approval-only journal item column to **Analytic Distribution** and moves it after **Label**, before **Debit**, to match Odoo's native journal item layout.
+
+## 19.0.5.0.26
+
+Version 19.0.5.0.26 fixes an **Access Error** ("You can only view bills, invoices, and journal entries assigned to you…") when a Branch Manager, CEO, or Auditor opens a credit note created with **Reverse**. The credit note links to the original bill or invoice (`reversed_entry_id`), and the form loads that document's name. Odoo 19 loads a related record's name with an id-only `web_read` and gets the name through sudo, on purpose without an access check. The module's `web_read` guard on `account.move` blocked that call when the approver was not assigned to the original document, so the whole form failed.
+
+The approval-only `web_read` guard on `account.move` and `account.move.line` now allows id-only requests, the same as Odoo. As a result:
+
+- Related documents the user is not assigned to are shown by name only (for example "Reversal of: BILL/…").
+- Opening, reading or searching a non-assigned document is still refused with the same message.
+
+No data migration is needed. The tests now use Odoo 19's `group_ids` field on users, and new regression tests cover the reversal case.

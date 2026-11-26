@@ -1,6 +1,6 @@
 {
     "name": "Branch Accounting Approval",
-    "version": "19.0.5.0.25",
+    "version": "19.0.5.0.26",
     "summary": "Auditor, Branch, CEO, and final Auditor approval routing for accounting documents",
     "description": """
 Branch Accounting Approval
@@ -44,6 +44,7 @@ Main capabilities:
 - Odoo-consistent Analytic Distribution column in approval-only Journal Items views
 - Prevents Reverse and Create Invoice from auto-posting unapproved credit notes
 - Tightened approver visibility so default approver fields do not expose every draft/unsubmitted bill
+- Approval-only users can open credit notes created with Reverse; the original document shows by name only
 """,
     "category": "Accounting/Accounting",
     "author": "HostKurd",
