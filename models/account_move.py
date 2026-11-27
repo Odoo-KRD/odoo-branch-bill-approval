@@ -57,6 +57,19 @@ def _approval_action_method(method):
     return wrapper
 
 
+def _is_id_only_web_read(specification):
+    """Return True when ``web_read`` only asks for record ids.
+
+    Odoo 19's ``web_read`` uses this shape to load a many2one value (for
+    example ``reversed_entry_id`` on a credit note): it reads the related
+    record with an empty specification and then gets its ``display_name``
+    with sudo.  In that case Odoo deliberately does not call ``read`` on the
+    related model, so related documents the user cannot open still show by
+    name.  The approval-only read guard must allow the same.
+    """
+    return not specification or list(specification) == ["id"]
+
+
 # Fields that must only be changed by the workflow action methods.  UI readonly
 # flags are not security controls, so direct RPC/import/write attempts are
 # blocked in create()/write() and workflow actions update these fields through
@@ -606,7 +619,8 @@ class AccountMove(models.Model):
         return super().read(fields=fields, load=load)
 
     def web_read(self, specification):
-        self._check_approval_only_move_read_access()
+        if not _is_id_only_web_read(specification):
+            self._check_approval_only_move_read_access()
         return super().web_read(specification)
 
     def _is_completed_approval_route(self):
@@ -1771,7 +1785,8 @@ class AccountMoveLine(models.Model):
         return super().read(fields=fields, load=load)
 
     def web_read(self, specification):
-        self._check_approval_only_line_read_access()
+        if not _is_id_only_web_read(specification):
+            self._check_approval_only_line_read_access()
         return super().web_read(specification)
 
     def _approval_locked_moves_for_line_guard(self):
